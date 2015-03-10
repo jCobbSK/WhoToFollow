@@ -1,6 +1,6 @@
 {
   "name": "__MSG_appName__",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "manifest_version": 2,
   "description": "__MSG_appDescription__",
   "icons": {
@@ -14,16 +14,20 @@
       "scripts/background.js"
     ]
   },
-
-  //all the logic is in content scripts
   "content_scripts": [
     {
-      "matches": ["http://www.twitter.com/*","https://www.twitter.com/*"],
-      "js": ["content.js"]
+      "matches": [
+        "http://www.twitter.com/*",
+        "https://www.twitter.com/*",
+        "http://twitter.com/*",
+        "https://twitter.com/*"
+      ],
+      "js": [
+        "bower_components/jquery/dist/jquery.js",
+        "scripts/content.js"
+      ]
     }
   ],
-
-  //extensions appearence in browser's menu
   "browser_action": {
     "default_icon": {
       "16": "images/icon-16.png",
