@@ -17,6 +17,7 @@ var WhoToFollow = (function(){
    * @return {Object} - object with following and followers keys and values
    */
   var parseProfilePage = function(username, htmlString) {
+    //TODO parse correct data from htmlString and return object as below
     return {
       username: username,
       followers: 1,
@@ -76,6 +77,7 @@ $(document).ready(function(){
       var self = this;
 
       WhoToFollow.getData(username, function(following, followers){
+        //TODO append data only if doesn't exists
         $(self).find('.ProfileNameTruncated-link').append(following+" / "+followers);
       });
     });
