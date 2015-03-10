@@ -13,5 +13,23 @@
       "scripts/chromereload.js",
       "scripts/background.js"
     ]
+  },
+
+  //all the logic is in content scripts
+  "content_scripts": [
+    {
+      "matches": ["http://www.twitter.com/*","https://www.twitter.com/*"],
+      "js": ["content.js"]
+    }
+  ],
+
+  //extensions appearence in browser's menu
+  "browser_action": {
+    "default_icon": {
+      "16": "images/icon-16.png",
+      "128": "images/icon-128.png"
+    },
+    "default_title": "WhoToFollow options",
+    "default_popup": "popup.html"
   }
 }
