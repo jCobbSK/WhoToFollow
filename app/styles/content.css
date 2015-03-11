@@ -28,3 +28,11 @@
 .WTF-second-row {
     margin-top: 5px;
 }
+
+.WTF-loader {
+    text-align: center;
+}
+
+.WTF-hidden {
+    display: none;
+}

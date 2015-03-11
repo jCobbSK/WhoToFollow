@@ -83,6 +83,12 @@ $(document).ready(function(){
 
   var updateData = function() {
     $('.ProfileCard-content').each(function(){
+
+      if ($(this).find('.WTF-loader').length == 0) {
+        var url = chrome.extension.getURL('images/default.gif');
+        $(this).find('.ProfileCard-userFields').append("<div class='WTF-loader'><img src='"+url+"'></div>");
+      }
+
       var username = $(this).children('a').attr('href');
       username = username.replace('/','');
       var self = this;
@@ -90,7 +96,10 @@ $(document).ready(function(){
       WhoToFollow.getData(username, function(user){
         if (!user)
           return;
+
+        //dont update if it is already rendered
         if ($(self).find('.WTF').length == 0) {
+          $(self).find('.WTF-loader').addClass('WTF-hidden');
           var following = "<li class='WTF-main-list'><a class='WTF-link' href='/"+user.username+"/following'><div class='WTF-upper-label u-textUserColor'>FOLLOWING</div><div class='WTF-main-label'>"+user.following+"</div></a></li>";
           var followers = "<li class='WTF-main-list'><a class='WTF-link' href='/"+user.username+"/followers'><div class='WTF-upper-label u-textUserColor'>FOLLOWERS</div><div class='WTF-main-label'>"+user.followers+"</div></a></li>";
           var tweets = "<li class='WTF-main-list'><a class='WTF-link' href='/"+user.username+"'><div class='WTF-upper-label u-textUserColor'>TWEETS</div><div class='WTF-main-label'>"+user.tweets+"</div></a></li>";

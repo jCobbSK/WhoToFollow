@@ -30,5 +30,8 @@
         "styles/content.css"
       ]
     }
+  ],
+  "web_accessible_resources": [
+    "images/*.gif"
   ]
 }
