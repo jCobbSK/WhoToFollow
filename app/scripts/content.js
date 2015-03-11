@@ -20,14 +20,16 @@ var WhoToFollow = (function(){
 
     var elements = $(htmlString);
     var tweets = $('.ProfileNav-item--tweets .ProfileNav-value', elements).html();
-    var following = $('.ProfileNav-item--following .ProfileNav-value', elements).html();;
-    var followers = $('.ProfileNav-item--followers .ProfileNav-value', elements).html();;
+    var following = $('.ProfileNav-item--following .ProfileNav-value', elements).html();
+    var followers = $('.ProfileNav-item--followers .ProfileNav-value', elements).html();
+    var lastActivity = $($('.Grid .js-short-timestamp', elements)[0]).html();
 
     var result = {
       username: username,
       followers: followers,
       following: following,
-      tweets: tweets
+      tweets: tweets,
+      lastSeen: lastActivity
     }
 
     cachedUsers[username] = result;
@@ -92,7 +94,8 @@ $(document).ready(function(){
           var following = "<li class='WTF-main-list'><a class='WTF-link' href='/"+user.username+"/following'><div class='WTF-upper-label u-textUserColor'>FOLLOWING</div><div class='WTF-main-label'>"+user.following+"</div></a></li>";
           var followers = "<li class='WTF-main-list'><a class='WTF-link' href='/"+user.username+"/followers'><div class='WTF-upper-label u-textUserColor'>FOLLOWERS</div><div class='WTF-main-label'>"+user.followers+"</div></a></li>";
           var tweets = "<li class='WTF-main-list'><a class='WTF-link' href='/"+user.username+"'><div class='WTF-upper-label u-textUserColor'>TWEETS</div><div class='WTF-main-label'>"+user.tweets+"</div></a></li>";
-          var final = "<ul class='WTF'>"+tweets+following+followers+"</ul>";
+          var lastSeen = "<br><li class='WTF-main-list WTF-second-row'><div class='WTF-upper-label u-textUserColor'>SEEN</div><div class='WTF-main-label'>"+user.lastSeen+"</div></li>";
+          var final = "<ul class='WTF'>"+tweets+following+followers+lastSeen+"</ul>";
         }
           $(self).find('.ProfileCard-userFields').append(final);
       });

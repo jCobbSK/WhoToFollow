@@ -20,3 +20,11 @@
     font-size: 18px;
     color: #292f33 !important;
 }
+
+.WTF-last-seen {
+    text-align: center;
+}
+
+.WTF-second-row {
+    margin-top: 5px;
+}
