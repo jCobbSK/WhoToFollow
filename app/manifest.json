@@ -29,6 +29,9 @@
       "js": [
         "bower_components/jquery/dist/jquery.js",
         "scripts/content.js"
+      ],
+      "css": [
+        "styles/content.css"
       ]
     }
   ]

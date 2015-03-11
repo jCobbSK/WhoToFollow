@@ -14,15 +14,25 @@ var WhoToFollow = (function(){
   /**
    * Parsing method of followers/following, ADDITIONALY RESULT ARE CACHED INSIDE cachedUsers
    * @param htmlString
-   * @return {Object} - object with following and followers keys and values
+   * @return {Object} - object with following,followers and tweets keys and values
    */
   var parseProfilePage = function(username, htmlString) {
-    //TODO parse correct data from htmlString and return object as below
-    return {
+
+    var elements = $(htmlString);
+    var tweets = $('.ProfileNav-item--tweets .ProfileNav-value', elements).html();
+    var following = $('.ProfileNav-item--following .ProfileNav-value', elements).html();;
+    var followers = $('.ProfileNav-item--followers .ProfileNav-value', elements).html();;
+
+    var result = {
       username: username,
-      followers: 1,
-      following: 10
+      followers: followers,
+      following: following,
+      tweets: tweets
     }
+
+    cachedUsers[username] = result;
+
+    return result;
   };
 
   return {
@@ -40,7 +50,7 @@ var WhoToFollow = (function(){
       var user = cachedUsers[username];
 
       if (user) {
-        callback(user.following, user.followers);
+        callback(user);
         return;
       }
 
@@ -49,17 +59,16 @@ var WhoToFollow = (function(){
         url: 'https://twitter.com/'+username,
         dataType: 'html',
         success: function(data) {
-          console.log('success');
           var result = parseProfilePage(username, data);
           if (result) {
-            callback(result.following, result.followers);
+            callback(result);
           } else {
-            callback('unknown', 'unknown');
+            callback(null);
           }
         },
         error: function(err) {
           console.log(err);
-          callback('error', 'error');
+          callback(null);
         }
       });
     }
@@ -76,9 +85,16 @@ $(document).ready(function(){
       username = username.replace('/','');
       var self = this;
 
-      WhoToFollow.getData(username, function(following, followers){
-        //TODO append data only if doesn't exists
-        $(self).find('.ProfileNameTruncated-link').append(following+" / "+followers);
+      WhoToFollow.getData(username, function(user){
+        if (!user)
+          return;
+        if ($(self).find('.WTF').length == 0) {
+          var following = "<li class='WTF-main-list'><div class='WTF-upper-label u-textUserColor'>FOLLOWING</div><div class='WTF-main-label'>"+user.following+"</div></li>";
+          var followers = "<li class='WTF-main-list'><div class='WTF-upper-label u-textUserColor'>FOLLOWERS</div><div class='WTF-main-label'>"+user.followers+"</div></li>";
+          var tweets = "<li class='WTF-main-list'><div class='WTF-upper-label u-textUserColor'>TWEETS</div><div class='WTF-main-label'>"+user.tweets+"</div></li>";
+          var final = "<ul class='WTF'>"+tweets+following+followers+"</ul>";
+        }
+          $(self).find('.ProfileCard-userFields').append(final);
       });
     });
   };

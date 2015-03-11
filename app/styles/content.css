@@ -1,0 +1,17 @@
+.WTF {
+    text-align: center;
+}
+
+.WTF-main-list {
+    display: inline-block;
+    text-align: center;
+    margin-right: 10px;
+}
+
+.WTF-upper-label {
+    font-size: 11px;
+}
+
+.WTF-main-label {
+    font-size: 18px;
+}
