@@ -17,13 +17,9 @@
   "content_scripts": [
     {
       "matches": [
-        "http://www.twitter.com/*/followers",
-        "https://www.twitter.com/*/followers",
-        "http://twitter.com/*/followers",
+        "https://twitter.com/followers",
+        "https://twitter.com/following",
         "https://twitter.com/*/followers",
-        "http://www.twitter.com/*/following",
-        "https://www.twitter.com/*/following",
-        "http://twitter.com/*/following",
         "https://twitter.com/*/following"
       ],
       "js": [
