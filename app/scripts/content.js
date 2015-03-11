@@ -89,9 +89,9 @@ $(document).ready(function(){
         if (!user)
           return;
         if ($(self).find('.WTF').length == 0) {
-          var following = "<li class='WTF-main-list'><div class='WTF-upper-label u-textUserColor'>FOLLOWING</div><div class='WTF-main-label'>"+user.following+"</div></li>";
-          var followers = "<li class='WTF-main-list'><div class='WTF-upper-label u-textUserColor'>FOLLOWERS</div><div class='WTF-main-label'>"+user.followers+"</div></li>";
-          var tweets = "<li class='WTF-main-list'><div class='WTF-upper-label u-textUserColor'>TWEETS</div><div class='WTF-main-label'>"+user.tweets+"</div></li>";
+          var following = "<li class='WTF-main-list'><a class='WTF-link' href='/"+user.username+"/following'><div class='WTF-upper-label u-textUserColor'>FOLLOWING</div><div class='WTF-main-label'>"+user.following+"</div></a></li>";
+          var followers = "<li class='WTF-main-list'><a class='WTF-link' href='/"+user.username+"/followers'><div class='WTF-upper-label u-textUserColor'>FOLLOWERS</div><div class='WTF-main-label'>"+user.followers+"</div></a></li>";
+          var tweets = "<li class='WTF-main-list'><a class='WTF-link' href='/"+user.username+"'><div class='WTF-upper-label u-textUserColor'>TWEETS</div><div class='WTF-main-label'>"+user.tweets+"</div></a></li>";
           var final = "<ul class='WTF'>"+tweets+following+followers+"</ul>";
         }
           $(self).find('.ProfileCard-userFields').append(final);
