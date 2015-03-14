@@ -77,9 +77,28 @@ var WhoToFollow = (function(){
   }
 })();
 
+/**
+ * We want loader icon instantly when user's block is loaded, it has to be moved out from document.ready because
+ * twitter load's user's blocks asynchronous.
+ */
+var documentReady = false;
+var beforeReadyInterval = setInterval(function(){
+  if (documentReady)
+    clearInterval(beforeReadyInterval);
+
+  $('.ProfileCard-content').each(function() {
+
+    if ($(this).find('.WTF-loader').length == 0) {
+      var url = chrome.extension.getURL('images/default.gif');
+      $(this).find('.ProfileCard-userFields').append("<div class='WTF-loader'><img src='" + url + "'></div>");
+    }
+  });
+},500);
+
 $(document).ready(function(){
 
   var initHeight = 0;
+  documentReady = true;
 
   var updateData = function() {
     $('.ProfileCard-content').each(function(){
