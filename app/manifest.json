@@ -39,5 +39,7 @@
 
   "permissions": [
     "storage"
-  ]
+  ],
+
+  "author": "jCobbSK"
 }

@@ -22,14 +22,18 @@ var WhoToFollow = (function(){
     var tweets = $('.ProfileNav-item--tweets .ProfileNav-value', elements).html();
     var following = $('.ProfileNav-item--following .ProfileNav-value', elements).html();
     var followers = $('.ProfileNav-item--followers .ProfileNav-value', elements).html();
-    var lastActivity = $($('.Grid .js-short-timestamp', elements)[0]).html();
+    var timeElem = $($('.Grid .js-short-timestamp', elements)[0]);
+    var lastActivity = timeElem.html();
+    var lastSeenTimestamp = timeElem.data('time');
 
     var result = {
       username: username,
       followers: followers,
       following: following,
       tweets: tweets,
-      lastSeen: lastActivity
+      lastSeen: lastActivity,
+      lastSeenTimestamp: lastSeenTimestamp,
+      ratio: following / followers
     }
 
     cachedUsers[username] = result;
@@ -99,11 +103,18 @@ $(document).ready(function(){
 
   var initHeight = 0;
   documentReady = true;
+
+  /**
+   * Settings initialized in options page.
+   */
   var SETTINGS = null;
   chrome.storage.sync.get('WTFsettings', function(setts){
     SETTINGS = setts['WTFsettings'];
   });
 
+  /**
+   * Actual manipulating with twitter's DOM. Fetching all tiles, getting info on users and show it.
+   */
   var updateData = function() {
     $('.ProfileCard-content').each(function(){
 
@@ -129,7 +140,13 @@ $(document).ready(function(){
           var lastSeen = SETTINGS.seen ? "<br><li class='WTF-main-list WTF-second-row'><div class='WTF-upper-label u-textUserColor'>SEEN</div><div class='WTF-main-label'>"+user.lastSeen+"</div></li>" : "";
           var final = "<ul class='WTF'>"+tweets+following+followers+lastSeen+"</ul>";
         }
-          $(self).find('.ProfileCard-userFields').append(final);
+        $(self).find('.ProfileCard-userFields').append(final);
+
+        //set background color if ratio and/or last seen is enabled and correct
+        if ((SETTINGS.ratioSwitched && SETTINGS.ratio < user.ratio) ||
+             SETTINGS.seenOffsetSwitched && user.lastSeenTimestamp > ((Date.now() / 1000) - (SETTINGS.seenOffset * (24*3600)))) {
+          $(self).parent().addClass('WTF-highlight');
+        }
       });
     });
   };

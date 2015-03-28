@@ -36,3 +36,7 @@
 .WTF-hidden {
     display: none;
 }
+
+.WTF-highlight {
+    border: 2px solid #55ACEE !important;
+}
