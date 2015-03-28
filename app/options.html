@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="bower_components/materialize/dist/css/materialize.css">
+        <style>
+            .checkbox-wrapper {
+                display: inline-block;
+                margin-left: 10px;
+            }
+
+            .number-input {
+                width: 45px !important;
+                text-align: center;
+            }
+
+            .inline {
+                display: inline-block !important;
+                margin-left: 25px;
+            }
+        </style>
+        <script src="scripts/options_page.js"></script>
+    </head>
+    <body>
+        <div class="container center-align">
+            <h3>WHAT TO SHOW</h3>
+            <div>Which elements to show on profile tile</div>
+
+            <div class="checkbox-wrapper">
+                <input type="checkbox" id="tweets" checked/>
+                <label for="tweets">Tweets</label>
+            </div>
+
+            <div class="checkbox-wrapper">
+                <input type="checkbox" id="followers" checked/>
+                <label for="followers">Followers</label>
+            </div>
+
+            <div class="checkbox-wrapper">
+                <input type="checkbox" id="following" checked/>
+                <label for="following">Following</label>
+            </div>
+
+            <div class="checkbox-wrapper">
+                <input type="checkbox" id="seen" checked/>
+                <label for="seen">Seen</label>
+            </div>
+
+            <h3>HIGHLIGHTING TILE</h3>
+            <div>Highlight profile tile based on followers/following ration and/or last seen date.</div>
+
+            <div>
+                <b>Followers/following ratio</b> <input type="text" value="1.0" class="number-input"> +- <input type="text" value="0.05" class="number-input">
+                <div class="switch inline">
+                    <label>
+                        Disable
+                        <input type="checkbox">
+                        <span class="lever"></span>
+                        Enable
+                    </label>
+                </div>
+            </div>
+            <div>
+                <b>Last seen less than:</b> <input type="number" value="10" class="number-input"> days ago.
+                <div class="switch inline">
+                    <label>
+                        Disable
+                        <input type="checkbox">
+                        <span class="lever"></span>
+                        Enable
+                    </label>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
