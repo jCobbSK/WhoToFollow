@@ -13,8 +13,7 @@ var Options = (function(){
           'followers': true,
           'following': true,
           'seen': true,
-          'ratio': 1,
-          'ratioOffset': 0.1,
+          'ratio': 1.0,
           'ratioSwitched': true,
           'seenOffset': 10,
           'seenOffsetSwitched': true

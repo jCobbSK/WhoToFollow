@@ -99,6 +99,10 @@ $(document).ready(function(){
 
   var initHeight = 0;
   documentReady = true;
+  var SETTINGS = null;
+  chrome.storage.sync.get('WTFsettings', function(setts){
+    SETTINGS = setts['WTFsettings'];
+  });
 
   var updateData = function() {
     $('.ProfileCard-content').each(function(){
@@ -119,10 +123,10 @@ $(document).ready(function(){
         //dont update if it is already rendered
         if ($(self).find('.WTF').length == 0) {
           $(self).find('.WTF-loader').addClass('WTF-hidden');
-          var following = "<li class='WTF-main-list'><a class='WTF-link' href='/"+user.username+"/following'><div class='WTF-upper-label u-textUserColor'>FOLLOWING</div><div class='WTF-main-label'>"+user.following+"</div></a></li>";
-          var followers = "<li class='WTF-main-list'><a class='WTF-link' href='/"+user.username+"/followers'><div class='WTF-upper-label u-textUserColor'>FOLLOWERS</div><div class='WTF-main-label'>"+user.followers+"</div></a></li>";
-          var tweets = "<li class='WTF-main-list'><a class='WTF-link' href='/"+user.username+"'><div class='WTF-upper-label u-textUserColor'>TWEETS</div><div class='WTF-main-label'>"+user.tweets+"</div></a></li>";
-          var lastSeen = "<br><li class='WTF-main-list WTF-second-row'><div class='WTF-upper-label u-textUserColor'>SEEN</div><div class='WTF-main-label'>"+user.lastSeen+"</div></li>";
+          var following = SETTINGS.following ? "<li class='WTF-main-list'><a class='WTF-link' href='/"+user.username+"/following'><div class='WTF-upper-label u-textUserColor'>FOLLOWING</div><div class='WTF-main-label'>"+user.following+"</div></a></li>" : "";
+          var followers = SETTINGS.followers ? "<li class='WTF-main-list'><a class='WTF-link' href='/"+user.username+"/followers'><div class='WTF-upper-label u-textUserColor'>FOLLOWERS</div><div class='WTF-main-label'>"+user.followers+"</div></a></li>" : "";
+          var tweets = SETTINGS.tweets ? "<li class='WTF-main-list'><a class='WTF-link' href='/"+user.username+"'><div class='WTF-upper-label u-textUserColor'>TWEETS</div><div class='WTF-main-label'>"+user.tweets+"</div></a></li>" : "";
+          var lastSeen = SETTINGS.seen ? "<br><li class='WTF-main-list WTF-second-row'><div class='WTF-upper-label u-textUserColor'>SEEN</div><div class='WTF-main-label'>"+user.lastSeen+"</div></li>" : "";
           var final = "<ul class='WTF'>"+tweets+following+followers+lastSeen+"</ul>";
         }
           $(self).find('.ProfileCard-userFields').append(final);
