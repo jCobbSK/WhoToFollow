@@ -18,6 +18,7 @@
                 margin-left: 25px;
             }
         </style>
+        <script src="bower_components/jquery/dist/jquery.js"></script>
         <script src="scripts/options_page.js"></script>
     </head>
     <body>
@@ -49,22 +50,22 @@
             <div>Highlight profile tile based on followers/following ration and/or last seen date.</div>
 
             <div>
-                <b>Followers/following ratio</b> <input type="text" value="1.0" class="number-input"> +- <input type="text" value="0.05" class="number-input">
+                <b>Followers/following ratio</b> <input type="text" id="ratio" value="1.0" class="number-input"> +- <input type="text" id="ratioOffset" value="0.05" class="number-input">
                 <div class="switch inline">
                     <label>
                         Disable
-                        <input type="checkbox">
+                        <input type="checkbox" id="ratioSwitched">
                         <span class="lever"></span>
                         Enable
                     </label>
                 </div>
             </div>
             <div>
-                <b>Last seen less than:</b> <input type="number" value="10" class="number-input"> days ago.
+                <b>Last seen less than:</b> <input type="number" id="seenOffset" value="10" class="number-input"> days ago.
                 <div class="switch inline">
                     <label>
                         Disable
-                        <input type="checkbox">
+                        <input type="checkbox" id="seenOffsetSwitched">
                         <span class="lever"></span>
                         Enable
                     </label>
