@@ -11,6 +11,9 @@ However default twitter page doesn't show you stats of account unless you open t
 because you want to follow people who tends to re-follow, that means their following/followers ration is close 
 to 1. **This extension provides functionality to see profile's number of tweets, followers, following and last activity.**
 
+#Where to get
+Actual version of extension is available via chrome webstore at https://chrome.google.com/webstore/detail/whotofollow/eepjakceehfefaceelphjhiomlnldgel . I really appreciate every download and comment (negative or positive).
+
 #Contribution
 I'll be happy for any opinions, suggestions, bug reports. You can tweet me @jCobbSK, or create pull request.
 > Thanks guys.
