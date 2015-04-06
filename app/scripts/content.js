@@ -3,11 +3,35 @@
  */
 var WhoToFollow = (function(){
 
+  //constructor, initialize settings from chrome storage
+  (function init(){
+    chrome.storage.sync.get('WTFsettings', function(setts){
+      if (setts['WTFsettings'])
+        settings = setts['WTFsettings'];
+      else
+        settings = {
+          'tweets': true,
+          'followers': true,
+          'following': true,
+          'seen': true,
+          'ratio': 1.0,
+          'ratioSwitched': true,
+          'seenOffset': 10,
+          'seenOffsetSwitched': true
+        }
+    });
+  })();
+
   /********* PRIVATE ATTRIBUTES **********/
   /**
    * Cached users is object where usernames are keys and values are objects with username,following and followers
    */
   var cachedUsers = {};
+
+  /**
+  * Settings object set by public method when ready
+  */
+  var settings = {};
 
   /********* PRIVATE METHODS *************/
 
@@ -19,21 +43,39 @@ var WhoToFollow = (function(){
   var parseProfilePage = function(username, htmlString) {
 
     var elements = $(htmlString);
-    var tweets = $('.ProfileNav-item--tweets .ProfileNav-value', elements).html();
-    var following = $('.ProfileNav-item--following .ProfileNav-value', elements).html();
-    var followers = $('.ProfileNav-item--followers .ProfileNav-value', elements).html();
-    var timeElem = $($('.Grid .js-short-timestamp', elements)[0]);
-    var lastActivity = timeElem.html();
-    var lastSeenTimestamp = timeElem.data('time');
+    var tweets = settings['tweets'] ? $('.ProfileNav-item--tweets .ProfileNav-value', elements).html() : false;
+    var following = settings['following'] ? $('.ProfileNav-item--following .ProfileNav-value', elements).html() : false;
+    var followers = settings['followers'] ? $('.ProfileNav-item--followers .ProfileNav-value', elements).html() : false;
+    if (settings['seen']) {
+      var timeElem = $($('.Grid .js-short-timestamp', elements)[0]);
+      var lastSeenString = timeElem.html();
+      var lastSeenTimestamp = timeElem.data('time');
+    } else {
+      var lastSeenString = false;
+    }
+
+    //default highlighting is true
+    var isHighlighting = true;
+
+    //all conditions for highlighting, if any is false the result is false
+    var ratio = following / followers;
+    if (settings['ratioSwitched'] && settings['ratio'] > ratio) {
+      isHighlighting = false;
+    }
+
+    if (settings['seenOffsetSwitched'] && lastSeenTimestamp &&
+      lastSeenTimestamp > ((Date.now() / 1000) - (settings['seenOffset'] * (24*3600)))) {
+        isHighlighting = false;
+    }
 
     var result = {
       username: username,
       followers: followers,
       following: following,
       tweets: tweets,
-      lastSeen: lastActivity,
+      lastSeenString: lastSeenString,
       lastSeenTimestamp: lastSeenTimestamp,
-      ratio: following / followers
+      highlight: isHighlighting
     }
 
     cachedUsers[username] = result;
@@ -77,8 +119,27 @@ var WhoToFollow = (function(){
           callback(null);
         }
       });
+    },
+
+    /**
+    * Set settings
+    * @param {Object} settings - settings from Options object
+    */
+    setSettings: function(settings) {
+      settings = settings;
+    },
+
+
+    /**
+     * Get settings value
+     *
+     * @param  {string} key setting's key of value
+     * @return {string}     value of setting's key
+     */
+    getSetting: function(key) {
+      return settings[key];
     }
-  }
+   }
 })();
 
 /**
@@ -105,14 +166,6 @@ $(document).ready(function(){
   documentReady = true;
 
   /**
-   * Settings initialized in options page.
-   */
-  var SETTINGS = null;
-  chrome.storage.sync.get('WTFsettings', function(setts){
-    SETTINGS = setts['WTFsettings'];
-  });
-
-  /**
    * Actual manipulating with twitter's DOM. Fetching all tiles, getting info on users and show it.
    */
   var updateData = function() {
@@ -130,23 +183,22 @@ $(document).ready(function(){
       WhoToFollow.getData(username, function(user){
         if (!user)
           return;
-
         //dont update if it is already rendered
         if ($(self).find('.WTF').length == 0) {
           $(self).find('.WTF-loader').addClass('WTF-hidden');
-          var following = SETTINGS.following ? "<li class='WTF-main-list'><a class='WTF-link' href='/"+user.username+"/following'><div class='WTF-upper-label u-textUserColor'>FOLLOWING</div><div class='WTF-main-label'>"+user.following+"</div></a></li>" : "";
-          var followers = SETTINGS.followers ? "<li class='WTF-main-list'><a class='WTF-link' href='/"+user.username+"/followers'><div class='WTF-upper-label u-textUserColor'>FOLLOWERS</div><div class='WTF-main-label'>"+user.followers+"</div></a></li>" : "";
-          var tweets = SETTINGS.tweets ? "<li class='WTF-main-list'><a class='WTF-link' href='/"+user.username+"'><div class='WTF-upper-label u-textUserColor'>TWEETS</div><div class='WTF-main-label'>"+user.tweets+"</div></a></li>" : "";
-          var lastSeen = SETTINGS.seen ? "<br><li class='WTF-main-list WTF-second-row'><div class='WTF-upper-label u-textUserColor'>SEEN</div><div class='WTF-main-label'>"+user.lastSeen+"</div></li>" : "";
+          var followers = user.followers ? "<li class='WTF-main-list'><a class='WTF-link' href='/"+user.username+"/followers'><div class='WTF-upper-label u-textUserColor'>FOLLOWERS</div><div class='WTF-main-label'>"+user.followers+"</div></a></li>" : "";
+          var following = user.following ? "<li class='WTF-main-list'><a class='WTF-link' href='/"+user.username+"/following'><div class='WTF-upper-label u-textUserColor'>FOLLOWING</div><div class='WTF-main-label'>"+user.following+"</div></a></li>" : "";
+          var tweets = user.tweets ? "<li class='WTF-main-list'><a class='WTF-link' href='/"+user.username+"'><div class='WTF-upper-label u-textUserColor'>TWEETS</div><div class='WTF-main-label'>"+user.tweets+"</div></a></li>" : "";
+          var lastSeen = user.lastSeenString ? "<br><li class='WTF-main-list WTF-second-row'><div class='WTF-upper-label u-textUserColor'>SEEN</div><div class='WTF-main-label'>"+user.lastSeenString+"</div></li>" : "";
           var final = "<ul class='WTF'>"+tweets+following+followers+lastSeen+"</ul>";
         }
         $(self).find('.ProfileCard-userFields').append(final);
 
-        //set background color if ratio and/or last seen is enabled and correct
-        if ((SETTINGS.ratioSwitched && SETTINGS.ratio < user.ratio) ||
-             SETTINGS.seenOffsetSwitched && user.lastSeenTimestamp > ((Date.now() / 1000) - (SETTINGS.seenOffset * (24*3600)))) {
+        //set highlighting
+        if (user.highlight) {
           $(self).parent().addClass('WTF-highlight');
         }
+
       });
     });
   };
