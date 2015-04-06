@@ -47,11 +47,22 @@ var WhoToFollow = (function(){
     var following = settings['following'] ? $('.ProfileNav-item--following .ProfileNav-value', elements).html() : false;
     var followers = settings['followers'] ? $('.ProfileNav-item--followers .ProfileNav-value', elements).html() : false;
     if (settings['seen']) {
-      var timeElem = $($('.Grid .js-short-timestamp', elements)[0]);
-      var lastSeenString = timeElem.html();
-      var lastSeenTimestamp = timeElem.data('time');
+
+      //we dont want to set time of retweet
+      var timeElem = false, lastSeenString = false, lastSeenTimestamp = false;
+      var tweetsElems = $('.ProfileTweet', elements);
+      for (var i=0, len = tweetsElems.length; i < len; i++) {
+        //if tweet is not retweet or pinned tweet
+        if (!$(tweetsElems[i]).data('retweetId') && !$(tweetsElems[i]).hasClass('is-pinned')) {
+          timeElem = $($('.js-short-timestamp', tweetsElems[i])[0]);
+          lastSeenString = timeElem.html();
+          lastSeenTimestamp = timeElem.data('time');
+          break;
+        }
+      }
     } else {
       var lastSeenString = false;
+      var lastSeenTimestamp = false;
     }
 
     //default highlighting is true
@@ -79,7 +90,6 @@ var WhoToFollow = (function(){
     }
 
     cachedUsers[username] = result;
-
     return result;
   };
 
