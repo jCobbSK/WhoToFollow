@@ -1,3 +1,6 @@
+'use strict';
+/* globals $ */
+
 var Options = (function(){
 
   var settings = null;
@@ -5,7 +8,7 @@ var Options = (function(){
   /**
    * Constructor function, initialize settings in chrome storage if it isn't already and initialize DOM.
    */
-  var init = (function(){
+  (function init(){
     chrome.storage.sync.get('WTFsettings', function(setts){
       if ($.isEmptyObject(setts)) {
         settings = {
@@ -17,11 +20,11 @@ var Options = (function(){
           'ratioSwitched': true,
           'seenOffset': 10,
           'seenOffsetSwitched': true
-        }
+        };
 
         saveSettings();
       } else {
-        settings = setts['WTFsettings'];
+        settings = setts.WTFsettings;
       }
       initDOM();
     });
@@ -35,43 +38,50 @@ var Options = (function(){
     chrome.storage.sync.set({'WTFsettings': settings}, function(){
       console.log('Settings updated');
     });
-  }
+  };
 
   /**
    * Deals with init of DOM of page. Sets listeners for inputs and updates settings.
    */
   var initDOM = function() {
     $(document).ready(function(){
+
+      function _onkeychangetrue() {
+        /*jshint validthis:true */
+        var key = $(this).attr('id');
+        if ($(this).is(':checked')) {
+          Options.saveSetting(key, true);
+        } else {
+          Options.saveSetting(key, false);
+        }
+      }
+
+      function _onkeychangefalse() {
+        /*jshint validthis:true */
+        var key = $(this).attr('id');
+        var value = $(this).val();
+        Options.saveSetting(key, value);
+      }
+
       for (var key in settings) {
 
         //if key is boolean -> dealing with checkbox
-        if (typeof settings[key] === "boolean") {
+        if (typeof settings[key] === 'boolean') {
           $('#'+key).prop('checked', settings[key]);
 
           //set listener for changes and persists them
-          $('#'+key).change(function(){
-            var key = $(this).attr('id');
-            if ($(this).is(':checked')) {
-              Options.saveSetting(key, true);
-            } else {
-              Options.saveSetting(key, false);
-            }
-          });
+          $('#'+key).change(_onkeychangetrue);
 
         } else {
           //key is string -> dealing with text/number input
           $('#'+key).val(settings[key]);
 
           //set listener for change
-          $('#'+key).change(function(){
-            var key = $(this).attr('id');
-            var value = $(this).val();
-            Options.saveSetting(key, value);
-          })
+          $('#'+key).change(_onkeychangefalse);
         }
       }
     });
-  }
+  };
 
   return {
 
@@ -88,7 +98,5 @@ var Options = (function(){
     getSettings: function() {
       return settings;
     }
-  }
+  };
 })();
-
-

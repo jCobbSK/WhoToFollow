@@ -1,14 +1,17 @@
 /**
  * File running on addressed pages defined in manifest.json
  */
+'use strict';
+
+/* globals $ */
 var WhoToFollow = (function(){
 
   //constructor, initialize settings from chrome storage
   (function init(){
     chrome.storage.sync.get('WTFsettings', function(setts){
-      if (setts['WTFsettings'])
-        settings = setts['WTFsettings'];
-      else
+      if (setts.WTFsettings) {
+        settings = setts.WTFsettings;
+      } else {
         settings = {
           'tweets': true,
           'followers': true,
@@ -18,7 +21,8 @@ var WhoToFollow = (function(){
           'ratioSwitched': true,
           'seenOffset': 10,
           'seenOffsetSwitched': true
-        }
+        };
+      }
     });
   })();
 
@@ -43,13 +47,13 @@ var WhoToFollow = (function(){
   var parseProfilePage = function(username, htmlString) {
 
     var elements = $(htmlString);
-    var tweets = settings['tweets'] ? $('.ProfileNav-item--tweets .ProfileNav-value', elements).html() : false;
-    var following = settings['following'] ? $('.ProfileNav-item--following .ProfileNav-value', elements).html() : false;
-    var followers = settings['followers'] ? $('.ProfileNav-item--followers .ProfileNav-value', elements).html() : false;
-    if (settings['seen']) {
+    var tweets = settings.tweets ? $('.ProfileNav-item--tweets .ProfileNav-value', elements).html() : false;
+    var following = settings.following ? $('.ProfileNav-item--following .ProfileNav-value', elements).html() : false;
+    var followers = settings.followers ? $('.ProfileNav-item--followers .ProfileNav-value', elements).html() : false;
+    var timeElem = false, lastSeenString = false, lastSeenTimestamp = false;
 
+    if (settings.seen) {
       //we dont want to set time of retweet
-      var timeElem = false, lastSeenString = false, lastSeenTimestamp = false;
       var tweetsElems = $('.ProfileTweet', elements);
       for (var i=0, len = tweetsElems.length; i < len; i++) {
         //if tweet is not retweet or pinned tweet
@@ -60,9 +64,6 @@ var WhoToFollow = (function(){
           break;
         }
       }
-    } else {
-      var lastSeenString = false;
-      var lastSeenTimestamp = false;
     }
 
     //default highlighting is true
@@ -70,13 +71,13 @@ var WhoToFollow = (function(){
 
     //all conditions for highlighting, if any is false the result is false
     var ratio = following / followers;
-    if (settings['ratioSwitched'] && settings['ratio'] > ratio) {
+    if (settings.ratioSwitched && settings.ratio > ratio) {
       isHighlighting = false;
     }
 
-    if (settings['seenOffsetSwitched'] && lastSeenTimestamp &&
-      lastSeenTimestamp > ((Date.now() / 1000) - (settings['seenOffset'] * (24*3600)))) {
-        isHighlighting = false;
+    if (settings.seenOffsetSwitched && lastSeenTimestamp &&
+      lastSeenTimestamp > ((Date.now() / 1000) - (settings.seenOffset * (24*3600)))) {
+      isHighlighting = false;
     }
 
     var result = {
@@ -87,7 +88,7 @@ var WhoToFollow = (function(){
       lastSeenString: lastSeenString,
       lastSeenTimestamp: lastSeenTimestamp,
       highlight: isHighlighting
-    }
+    };
 
     cachedUsers[username] = result;
     return result;
@@ -149,7 +150,7 @@ var WhoToFollow = (function(){
     getSetting: function(key) {
       return settings[key];
     }
-   }
+  };
 })();
 
 /**
@@ -158,14 +159,15 @@ var WhoToFollow = (function(){
  */
 var documentReady = false;
 var beforeReadyInterval = setInterval(function(){
-  if (documentReady)
+  if (documentReady) {
     clearInterval(beforeReadyInterval);
+  }
 
   $('.ProfileCard-content').each(function() {
 
-    if ($(this).find('.WTF-loader').length == 0) {
+    if ($(this).find('.WTF-loader').length === 0) {
       var url = chrome.extension.getURL('images/default.gif');
-      $(this).find('.ProfileCard-userFields').append("<div class='WTF-loader'><img src='" + url + "'></div>");
+      $(this).find('.ProfileCard-userFields').append('<div class="WTF-loader"><img src="' + url + '"></div>');
     }
   });
 },500);
@@ -181,9 +183,9 @@ $(document).ready(function(){
   var updateData = function() {
     $('.ProfileCard-content').each(function(){
 
-      if ($(this).find('.WTF-loader').length == 0) {
+      if ($(this).find('.WTF-loader').length === 0) {
         var url = chrome.extension.getURL('images/default.gif');
-        $(this).find('.ProfileCard-userFields').append("<div class='WTF-loader'><img src='"+url+"'></div>");
+        $(this).find('.ProfileCard-userFields').append('<div class="WTF-loader"><img src="'+url+'"></div>');
       }
 
       var username = $(this).children('a').attr('href');
@@ -191,18 +193,17 @@ $(document).ready(function(){
       var self = this;
 
       WhoToFollow.getData(username, function(user){
-        if (!user)
-          return;
+        if (!user) { return; }
         //dont update if it is already rendered
-        if ($(self).find('.WTF').length == 0) {
+        if ($(self).find('.WTF').length === 0) {
           $(self).find('.WTF-loader').addClass('WTF-hidden');
-          var followers = user.followers ? "<li class='WTF-main-list'><a class='WTF-link' href='/"+user.username+"/followers'><div class='WTF-upper-label u-textUserColor'>FOLLOWERS</div><div class='WTF-main-label'>"+user.followers+"</div></a></li>" : "";
-          var following = user.following ? "<li class='WTF-main-list'><a class='WTF-link' href='/"+user.username+"/following'><div class='WTF-upper-label u-textUserColor'>FOLLOWING</div><div class='WTF-main-label'>"+user.following+"</div></a></li>" : "";
-          var tweets = user.tweets ? "<li class='WTF-main-list'><a class='WTF-link' href='/"+user.username+"'><div class='WTF-upper-label u-textUserColor'>TWEETS</div><div class='WTF-main-label'>"+user.tweets+"</div></a></li>" : "";
-          var lastSeen = user.lastSeenString ? "<br><li class='WTF-main-list WTF-second-row'><div class='WTF-upper-label u-textUserColor'>SEEN</div><div class='WTF-main-label'>"+user.lastSeenString+"</div></li>" : "";
-          var final = "<ul class='WTF'>"+tweets+following+followers+lastSeen+"</ul>";
+          var followers = user.followers ? '<li class="WTF-main-list"><a class="WTF-link" href="/'+user.username+'/followers"><div class="WTF-upper-label u-textUserColor">FOLLOWERS</div><div class="WTF-main-label">'+user.followers+'</div></a></li>' : '';
+          var following = user.following ? '<li class="WTF-main-list"><a class="WTF-link" href="/'+user.username+'/following"><div class="WTF-upper-label u-textUserColor">FOLLOWING</div><div class="WTF-main-label">'+user.following+'</div></a></li>' : '';
+          var tweets = user.tweets ? '<li class="WTF-main-list"><a class="WTF-link" href="/'+user.username+'"><div class="WTF-upper-label u-textUserColor">TWEETS</div><div class="WTF-main-label">'+user.tweets+'</div></a></li>' : '';
+          var lastSeen = user.lastSeenString ? '<br><li class="WTF-main-list WTF-second-row"><div class="WTF-upper-label u-textUserColor">SEEN</div><div class="WTF-main-label">'+user.lastSeenString+'</div></li>' : '';
+          var final = '<ul class="WTF">'+tweets+following+followers+lastSeen+'</ul>';
+          $(self).find('.ProfileCard-userFields').append(final);
         }
-        $(self).find('.ProfileCard-userFields').append(final);
 
         //set highlighting
         if (user.highlight) {
@@ -216,8 +217,7 @@ $(document).ready(function(){
   //check every 2secs if main container's height didn't changed, if so, refresh data
   setInterval(function(){
     var actualHeight = $('.GridTimeline').height();
-    if (initHeight == actualHeight)
-      return;
+    if (initHeight === actualHeight) { return; }
 
     initHeight = actualHeight;
     updateData();
