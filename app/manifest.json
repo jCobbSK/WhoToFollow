@@ -26,7 +26,8 @@
       ],
       "js": [
         "bower_components/jquery/dist/jquery.js",
-        "scripts/content.js"
+        "bower_components/moment/moment.min.js",
+        "scripts/content-bundle.js"
       ],
       "css": [
         "styles/content.css"

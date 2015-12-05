@@ -32,19 +32,16 @@ module.exports = function (grunt) {
         files: ['bower.json'],
         tasks: ['bowerInstall']
       },
-      js: {
-        files: ['<%= config.app %>/scripts/{,*/}*.js'],
-        tasks: ['jshint'],
-        options: {
-          livereload: '<%= connect.options.livereload %>'
-        }
+      es6: {
+        files: ['<%= config.app %>/**/*.es6'],
+        tasks: ['babel:dist', 'concat:dist']
       },
       gruntfile: {
         files: ['Gruntfile.js']
       },
       styles: {
         files: ['<%= config.app %>/styles/{,*/}*.css'],
-        tasks: [],
+        tasks: ['sass:dist'],
         options: {
           livereload: '<%= connect.options.livereload %>'
         }
@@ -104,19 +101,6 @@ module.exports = function (grunt) {
       }
     },
 
-    // Make sure code styles are up to par and there are no obvious mistakes
-    jshint: {
-      options: {
-        jshintrc: '.jshintrc',
-        reporter: require('jshint-stylish')
-      },
-      all: [
-        'Gruntfile.js',
-        '<%= config.app %>/scripts/{,*/}*.js',
-        '!<%= config.app %>/scripts/vendor/*',
-        'test/spec/{,*/}*.js'
-      ]
-    },
     mocha: {
       all: {
         options: {
@@ -222,9 +206,12 @@ module.exports = function (grunt) {
     //     }
     //   }
     // },
-    // concat: {
-    //   dist: {}
-    // },
+    concat: {
+      dist: {
+        src: ['<%= config.app %>/scripts/content/*.js', '<%= config.app %>/scripts/content.js'],
+        dest: '<%= config.app %>/scripts/content-bundle.js'
+      }
+    },
 
     // Copies remaining files to places other tasks can use
     copy: {
@@ -292,14 +279,38 @@ module.exports = function (grunt) {
           dest: ''
         }]
       }
+    },
+
+    babel: {
+      options: {
+        sourceMap: false,
+        presets: ['es2015']
+      },
+      dist: {
+        files: [{
+          expand: true,
+          cwd: '<%= config.app %>/scripts/content-es6',
+          src: ['**/*.es6'],
+          dest: '<%= config.app %>/scripts/content',
+          ext: '.js'
+        },{
+          '<%= config.app %>/scripts/content.js': '<%= config.app %>/scripts/content.es6',
+          '<%= config.app %>/scripts/options_page.js': '<%= config.app %>/scripts/options_page.es6'
+        }]
+      }
+    },
+
+    sass: {
+      dist: {
+        files: {
+          '<%= config.app %>/styles/content.css': '<%= config.app %>/styles/content.sass'
+        }
+      }
     }
   });
 
   grunt.registerTask('debug', function () {
     grunt.task.run([
-      'jshint',
-      'concurrent:chrome',
-      'connect:chrome',
       'watch'
     ]);
   });
@@ -311,7 +322,9 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build', [
     'clean:dist',
+    'babel:dist',
     'chromeManifest:dist',
+    'sass:dist',
     'useminPrepare',
     'concurrent:dist',
     // No UI feature selected, cssmin task will be commented
@@ -324,7 +337,6 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('default', [
-    'jshint',
     'test',
     'build'
   ]);
