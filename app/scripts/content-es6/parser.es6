@@ -1,5 +1,5 @@
-import Settings from './settings.js';
-import Cache from './cache.js';
+var Settings = require('./settings.js');
+var Cache = require('./cache.js');
 
 /**
  * Module for actual parsing relevant data from raw profile page.
@@ -155,4 +155,4 @@ function Parser() {
   }
 }
 
-export default Parser();
+module.exports = Parser();

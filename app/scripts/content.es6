@@ -1,5 +1,5 @@
-import Parser from 'content/parser.js';
-import Formatter from 'content/formatter.js';
+var Parser = require('./content/parser.js');
+var Formatter = require('./content/formatter.js');
 
 const REFRESH_TIME = 2000;
 

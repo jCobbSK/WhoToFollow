@@ -281,12 +281,16 @@ module.exports = function (grunt) {
       }
     },
 
-    babel: {
-      options: {
-        sourceMap: false,
-        presets: ['es2015']
-      },
+    browserify: {
       dist: {
+        options: {
+          transform: [
+            ["babelify", {
+              loose: "all",
+              presets: ["es2015"]
+            }]
+          ]
+        },
         files: [{
           expand: true,
           cwd: '<%= config.app %>/scripts/content-es6',
@@ -307,6 +311,14 @@ module.exports = function (grunt) {
         }
       }
     }
+  });
+
+  grunt.registerTask('soft-build', function() {
+    grunt.task.run([
+      'browserify:dist',
+      'concat',
+      'watch'
+    ]);
   });
 
   grunt.registerTask('debug', function () {

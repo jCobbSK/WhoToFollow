@@ -376,6 +376,13 @@ function Loader() {
   var settings = null;
 
   /**
+   * If we want to ensure settings are loaded, we can set callback via
+   * afterInit method.
+   * @type {Function}
+   */
+  var afterInitCallback = null;
+
+  /**
    * Save actual settings attribute object to chrome storage.
    * @return {void}
    */
@@ -392,6 +399,10 @@ function Loader() {
       saveSettings();
     } else {
       settings = _settings;
+    }
+
+    if (afterInitCallback) {
+      afterInitCallback(settings);
     }
   });
 
@@ -433,6 +444,15 @@ function Loader() {
     setSetting: function setSetting(key, value) {
       settings[key] = value;
       saveSettings();
+    },
+
+    /**
+     * Ensure settings are loaded from chrome storage.
+     * @param  {Function} callback Callback which returns loaded settings
+     * @return {void}
+     */
+    afterInit: function afterInit(callback) {
+      afterInitCallback = callback;
     }
   };
 }

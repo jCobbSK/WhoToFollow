@@ -117,4 +117,4 @@ function Formatter() {
   }
 }
 
-export default Formatter;
+module.exports = Formatter;
