@@ -7,12 +7,24 @@ import Cache from './cache.js';
 function Parser() {
 
   /**
+   * Trigger hover on element. Correct number is shown in tooltip after hover.
+   * So we need to refresh it beforehand.
+   * @context {string} type of data [ 'tweets' | 'followers' | 'following' ]
+   * @param  {jquery DOM elements} elements
+   * @return {void}
+   */
+  function triggerHover(elements) {
+    $(`.ProfileNav-item--${this} a`, elements).trigger('mouseover');
+  }
+
+  /**
    * Parse number of item from data field in twitter page.
    * e.q. value="88,455 Following" returns 88455
    * @param  {String} value
    * @return {number}
    */
   function parseValue(value) {
+    if (!value) { return 0; }
     return parseInt(value.replace(',', ''));
   }
 
@@ -22,6 +34,7 @@ function Parser() {
    * @return {number}
    */
   function parseTweets(elements) {
+    triggerHover.call('tweets', elements);
     return {
       fullNumber: parseValue($('.ProfileNav-item--tweets a', elements).data('original-title')),
       text: $('.ProfileNav-item--tweets .ProfileNav-value', elements).html()
@@ -34,6 +47,7 @@ function Parser() {
    * @return {{text: [string], fullNumber: [number]}}
    */
   function parseFollowing(elements) {
+    triggerHover.call('following', elements);
     return {
       text: $('.ProfileNav-item--following .ProfileNav-value', elements).html(),
       fullNumber: parseValue($('.ProfileNav-item--following a', elements).data('original-title'))
@@ -46,6 +60,7 @@ function Parser() {
    * @return {{text: [string], fullNumber: [number]}}
    */
   function parseFollowers(elements) {
+    triggerHover.call('followers', elements);
     return {
       text: $('.ProfileNav-item--followers .ProfileNav-value', elements).html(),
       fullNumber: parseValue($('.ProfileNav-item--followers a', elements).data('original-title'))
