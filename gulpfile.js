@@ -9,7 +9,10 @@ var gulp = require('gulp'),
     transpile = require('gulp-es6-module-transpiler'),
     babel = require('gulp-babel'),
     sass = require('gulp-sass'),
-    usemin = require('gulp-usemin');
+    usemin = require('gulp-usemin'),
+    concat = require('gulp-concat');
+
+console.log(transpile.formatters);
 
 //clean build directory
 gulp.task('clean', function() {
@@ -36,6 +39,7 @@ gulp.task('html', function() {
     .pipe(gulp.dest('build'));
 });
 
+//build bower_components in html
 gulp.task('usemin', function() {
   return gulp.src('app/*.html')
     .pipe(usemin())
@@ -60,10 +64,20 @@ gulp.task('scripts', function() {
       formatter: 'bundle',
       basePath: 'app/scripts'
     }))
+    .pipe(concat('bundle.js'))
     .pipe(gulp.dest('build/scripts'));
 });
 
-gulp.task('zip', ['usemin','html', 'scripts', 'styles', 'copy'], function() {
+//build content vendor scripts
+gulp.task('vendor-content-scripts', function() {
+  return gulp.src([
+                  'app/bower_components/jquery/dist/jquery.js',
+                  'app/bower_components/moment/moment.js'])
+              .pipe(concat('vendor-content.js'))
+              .pipe(gulp.dest('build/scripts'));
+});
+
+gulp.task('zip', ['usemin','html', 'scripts', 'styles', 'copy', 'vendor-content-scripts'], function() {
   var manifest = require('./app/manifest'),
       distFileName = manifest.name + ' v' + manifest.version + '.zip',
       mapFileName = manifest.name + ' v' + manifest.version + '-maps.zip';

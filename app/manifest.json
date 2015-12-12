@@ -25,9 +25,8 @@
         "https://twitter.com/*/following"
       ],
       "js": [
-        "bower_components/jquery/dist/jquery.js",
-        "bower_components/moment/moment.js",
-        "scripts/content-bundle.js"
+        "scripts/vendor-content.js",
+        "scripts/bundle.js"
       ],
       "css": [
         "styles/content.css"
