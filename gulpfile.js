@@ -57,14 +57,13 @@ gulp.task('styles', function() {
 //transpile JS with ES6 transpiler and compile them to ES5
 gulp.task('scripts', function() {
   return gulp.src('app/scripts/**/*.js')
-    .pipe(babel({
-      presets: ['es2015']
-    }))
     .pipe(transpile({
       formatter: 'bundle',
       basePath: 'app/scripts'
     }))
-    .pipe(concat('bundle.js'))
+    .pipe(babel({
+      presets: ['es2015']
+    }))
     .pipe(gulp.dest('build/scripts'));
 });
 

@@ -42,8 +42,10 @@ function Loader() {
    * @return {void}
    */
   function saveSettings() {
-    chrome.storage.sync.set({STORAGE_KEY: settings}, () => {
-      console.log('Settings updated');
+    var obj = {};
+    obj[STORAGE_KEY] = settings;
+    chrome.storage.sync.set(obj, () => {
+      console.log('Settings updated', settings);
     });
   }
 
@@ -53,7 +55,7 @@ function Loader() {
       settings = DEFAULT_SETTINGS;
       saveSettings();
     } else {
-      settings = _settings;
+      settings = _settings[STORAGE_KEY];
     }
 
     if (afterInitCallback) { afterInitCallback(settings); }
@@ -61,7 +63,7 @@ function Loader() {
 
   //Use chrome storage listener for changes so it is synced.
   chrome.storage.onChanged.addListener((changes) => {
-    for (key in changes) {
+    for (let key in changes) {
       if (key === STORAGE_KEY) {
         settings = changes[key].newValue;
       }
@@ -74,8 +76,12 @@ function Loader() {
      * @param  {Function} callback [setting object]
      * @return {Object} [settings object]
      */
-    getSettings() {
-      return settings;
+    getSettings(callback) {
+      if (settings) {
+        callback(settings);
+      } else {
+        afterInitCallback = callback;
+      }
     },
 
     /**
