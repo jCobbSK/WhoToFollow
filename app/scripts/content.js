@@ -1,4 +1,4 @@
-import Parse from './content/parser.js';
+import Parser from './content/parser.js';
 import Formatter from './content/formatter.js';
 
 const REFRESH_TIME = 2000;
