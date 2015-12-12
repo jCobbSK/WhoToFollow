@@ -1,5 +1,5 @@
-var Settings = require('./settings.js');
-var Cache = require('./cache.js');
+import Settings from './settings.js';
+import Cache from './cache.js';
 
 /**
  * Module for actual parsing relevant data from raw profile page.
