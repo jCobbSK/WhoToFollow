@@ -1,47 +1,40 @@
-(function() {
-    "use strict";
-    'use strict';
+import Settings from './content/settings.js';
 
-    var _settings = require('./content/settings.js');
+$(document).ready(function(){
 
-    var _settings2 = _interopRequireDefault(_settings);
+  function _onkeychangetrue() {
+    /*jshint validthis:true */
+    var key = $(this).attr('id');
+    if ($(this).is(':checked')) {
+      Settings.saveSetting(key, true);
+    } else {
+      Settings.saveSetting(key, false);
+    }
+  }
 
-    function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+  function _onkeychangefalse() {
+    /*jshint validthis:true */
+    var key = $(this).attr('id');
+    var value = $(this).val();
+    Settings.saveSetting(key, value);
+  }
 
-    $(document).ready(function () {
+  for (var key in settings) {
 
-      function _onkeychangetrue() {
-        /*jshint validthis:true */
-        var key = $(this).attr('id');
-        if ($(this).is(':checked')) {
-          _settings2.default.saveSetting(key, true);
-        } else {
-          _settings2.default.saveSetting(key, false);
-        }
-      }
+    //if key is boolean -> dealing with checkbox
+    if (typeof settings[key] === 'boolean') {
+      $('#'+key).prop('checked', settings[key]);
 
-      function _onkeychangefalse() {
-        /*jshint validthis:true */
-        var key = $(this).attr('id');
-        var value = $(this).val();
-        _settings2.default.saveSetting(key, value);
-      }
+      //set listener for changes and persists them
+      $('#'+key).change(_onkeychangetrue);
 
-      for (var key in settings) {
+    } else {
+      //key is string -> dealing with text/number input
+      $('#'+key).val(settings[key]);
 
-        //if key is boolean -> dealing with checkbox
-        if (typeof settings[key] === 'boolean') {
-          $('#' + key).prop('checked', settings[key]);
+      //set listener for change
+      $('#'+key).change(_onkeychangefalse);
+    }
+  }
 
-          //set listener for changes and persists them
-          $('#' + key).change(_onkeychangetrue);
-        } else {
-          //key is string -> dealing with text/number input
-          $('#' + key).val(settings[key]);
-
-          //set listener for change
-          $('#' + key).change(_onkeychangefalse);
-        }
-      }
-    });
-}).call(this);
+});

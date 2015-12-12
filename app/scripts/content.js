@@ -1,60 +1,45 @@
-(function() {
-    "use strict";
-    'use strict';
+import Parse from './content/parser.js';
+import Formatter from './content/formatter.js';
 
-    var _parser = require('./content/parser.js');
+const REFRESH_TIME = 2000;
 
-    var _parser2 = _interopRequireDefault(_parser);
+var lastHeight = 0;
 
-    var _formatter = require('./content/formatter.js');
+/**
+ * Check if page changed (expanded => more users were loaded), if so, process them.
+ * @return {void}
+ */
+function processPage() {
+  var actualHeight = $('.GridTimeline').height();
+  if (lastHeight === actualHeight) { return; }
 
-    var _formatter2 = _interopRequireDefault(_formatter);
+  lastHeight = actualHeight;
 
-    function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+  processUsers();
+}
 
-    var REFRESH_TIME = 2000;
+/**
+ * Process users on page.
+ * @return {void}
+ */
+function processUsers() {
+  $('.ProfileCard-content').each(function(){
 
-    var lastHeight = 0;
+    //no user yet -> put loader inside
+    Formatter.updateElement(this, null);
 
-    /**
-     * Check if page changed (expanded => more users were loaded), if so, process them.
-     * @return {void}
-     */
-    function processPage() {
-      var actualHeight = $('.GridTimeline').height();
-      if (lastHeight === actualHeight) {
-        return;
-      }
+    let username = $(this).children('a').attr('href').replace('/', '');
 
-      lastHeight = actualHeight;
+    Parser.parseProfile(username, (user) => {
+      Formatter.updateElement(this, user);
+    });
+  });
+}
 
-      processUsers();
-    }
+//initial processing page
+processPage();
 
-    /**
-     * Process users on page.
-     * @return {void}
-     */
-    function processUsers() {
-      $('.ProfileCard-content').each(function () {
-        var _this = this;
-
-        //no user yet -> put loader inside
-        _formatter2.default.updateElement(this, null);
-
-        var username = $(this).children('a').attr('href').replace('/', '');
-
-        _parser2.default.parseProfile(username, function (user) {
-          _formatter2.default.updateElement(_this, user);
-        });
-      });
-    }
-
-    //initial processing page
-    processPage();
-
-    //check change every 2 seconds
-    setInterval(function () {
-      processPage();
-    }, REFRESH_TIME);
-}).call(this);
+//check change every 2 seconds
+setInterval(() => {
+  processPage();
+}, REFRESH_TIME);

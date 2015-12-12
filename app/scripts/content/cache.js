@@ -1,53 +1,42 @@
-(function() {
-    "use strict";
-    "use strict";
+/**
+ * Cache module to cache already fetched data of users.
+ */
+function Cache() {
 
-    Object.defineProperty(exports, "__esModule", {
-      value: true
-    });
+  /**
+   * User data objects.
+   * @type {Array of Objects}
+   */
+  var usersStorage = [];
+
+  function getUser(username) {
+    return usersStorage.find((user) => user.username === username);
+  }
+
+  return {
     /**
-     * Cache module to cache already fetched data of users.
+     * Add user to cache.
+     * @param {User object} user [user object, username is required attribute]
+     * @return {boolean} [was actual added]
      */
-    function Cache() {
-
-      /**
-       * User data objects.
-       * @type {Array of Objects}
-       */
-      var usersStorage = [];
-
-      function _getUser(username) {
-        return usersStorage.find(function (user) {
-          return user.username === username;
-        });
+    addUser(user) {
+      if (getUser(user.username)) {
+        return false;
       }
 
-      return {
-        /**
-         * Add user to cache.
-         * @param {User object} user [user object, username is required attribute]
-         * @return {boolean} [was actual added]
-         */
+      usersStorage.push(user);
+      return true;
+    },
 
-        addUser: function addUser(user) {
-          if (_getUser(user.username)) {
-            return false;
-          }
-
-          usersStorage.push(user);
-          return true;
-        },
-
-        /**
-         * Retrieve user by username
-         * @param  {String} username
-         * @return {User}
-         */
-        getUser: function getUser(username) {
-          _getUser(username);
-        }
-      };
+    /**
+     * Retrieve user by username
+     * @param  {String} username
+     * @return {User}
+     */
+    getUser(username) {
+      getUser(username);
     }
+  }
+}
 
-    exports.default = Cache();
-}).call(this);
+export default Cache();
